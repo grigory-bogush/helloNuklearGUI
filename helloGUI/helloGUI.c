@@ -228,11 +228,11 @@ int main(int argc, char** argv)
 
 
     struct sdlsurface_context* context = nk_sdlsurface_init(surface, 13.0f);
-
+    struct nk_context* ctx = &context->ctx;
 
     while (1)
     {
-        nk_input_begin(&(context->ctx));
+        nk_input_begin(ctx);
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -247,15 +247,26 @@ int main(int argc, char** argv)
             enum { EASY, HARD };
             static int op = EASY;
             static int property = 20;
-            nk_layout_row_static(&(context->ctx), 30, 80, 1);
-            if (nk_button_label(&(context->ctx), "button")) {
+            nk_layout_row_static(ctx, 30, 80, 1);
+            if (nk_button_label(ctx, "button")) {
                 printf("button pressed\n");
             }
-            nk_layout_row_dynamic(&(context->ctx), 40, 2);
-            if (nk_option_label(&(context->ctx), "easy", op == EASY)) op = EASY;
-            if (nk_option_label(&(context->ctx), "hard", op == HARD)) op = HARD;
-            nk_layout_row_dynamic(&(context->ctx), 45, 1);
-            nk_property_int(&(context->ctx), "Compression:", 0, &property, 100, 10, 1);
+            nk_layout_row_dynamic(ctx, 40, 2);
+            if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
+            if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
+            nk_layout_row_dynamic(ctx, 45, 1);
+            nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
+
+            // My test wigets
+            nk_layout_row_dynamic(&(context->ctx), 20, 2);
+            static char label[] = "Words";
+            nk_text_wrap(ctx, label, strlen(label));
+            nk_text_wrap(ctx, label, strlen(label));
+
+            static char input[20];
+            static int input_len;
+            nk_label(ctx, "Title:", NK_TEXT_RIGHT);
+            nk_edit_string(ctx, NK_EDIT_FIELD, &input, &input_len, 20, NULL);
         }
         nk_end(&(context->ctx));
 
