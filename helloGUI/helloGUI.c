@@ -34,6 +34,7 @@
 #define NK_SDLSURFACE_IMPLEMENTATION
 #include "sdl2surface_rawfb.h"
 
+
 static int translate_sdl_key(struct SDL_Keysym const* k)
 {
     /*keyboard handling left as an exercise for the reader */
@@ -62,8 +63,7 @@ static int sdl_button_to_nk(int button)
 }
 
 
-static void
-grid_demo(struct nk_context* ctx)
+static void grid_demo(struct nk_context* ctx)
 {
     static char text[3][64];
     static int text_len[3];
@@ -188,7 +188,7 @@ int main(int argc, char** argv)
         }
         nk_end(&(context->ctx));
 
-        //        grid_demo(&(context->ctx));
+        grid_demo(&(context->ctx));
 
         nk_sdlsurface_render(context, clear, 1);
 
