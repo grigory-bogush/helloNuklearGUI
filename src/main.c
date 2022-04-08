@@ -9,9 +9,9 @@
 #include <limits.h>
 #include <time.h>
 
-#include <SDL.h>
-#include <SDL_mouse.h>
-#include <SDL_keyboard.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_keyboard.h>
 
 
 #ifndef MIN

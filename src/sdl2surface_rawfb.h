@@ -31,8 +31,8 @@
 #ifndef NK_SDLSURFACE_H_
 #define NK_SDLSURFACE_H_
 
-#include <SDL.h>
-#include <SDL_surface.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_surface.h>
 
 struct sdlsurface_context* nk_sdlsurface_init(SDL_Surface* fb, float fontSize);
 void                  nk_sdlsurface_render(const struct sdlsurface_context* sdlsurface, const struct nk_color clear, const unsigned char enable_clear);
@@ -337,7 +337,7 @@ nk_sdlsurface_fill_polygon(const struct sdlsurface_context* sdlsurface,
             } j = i;
         }
 
-        /*  Sort the nodes, via a simple “Bubble” sort. */
+        /*  Sort the nodes, via a simple ï¿½Bubbleï¿½ sort. */
         i = 0;
         while (i < nodes - 1) {
             if (nodeX[i] > nodeX[i + 1]) {
