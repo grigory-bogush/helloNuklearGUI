@@ -194,13 +194,92 @@ static void grid_demo(struct nk_context* ctx)
     nk_end(ctx);
 }
 
+static void draw_todo_item(struct nk_context* context) {
+    int item_height = 60;
+    static int is_checked = 0;
+
+    nk_layout_row_static(context, item_height, 400, 1);
+    if (nk_group_begin(context, "todo item", NK_WINDOW_BORDER)) {
+        nk_layout_row_static(context, 30, 120, 3);
+
+        nk_checkbox_label(context, "Check me", &is_checked);
+        nk_label(context, "todo item title", NK_TEXT_CENTERED);
+        if (nk_button_label(context, "X")) {
+            printf("delete item button click");
+        }
+        nk_group_end(context);
+    }
+}
+
+
+static void draw_todo_list(struct nk_context* context) {
+    int pos_x = 500;
+    int pos_y = 500;
+    int frame_width = 600;
+    int frame_height = 400;
+
+    int frame_params = NK_WINDOW_TITLE | NK_WINDOW_BORDER | NK_WINDOW_MOVABLE;
+    struct nk_rect frame = nk_rect(pos_x, pos_y, frame_width, frame_height);
+
+    if (nk_begin(context, "todo list demo", frame, frame_params)) {
+
+        nk_layout_row_static(context, 20, 100, 1);
+        nk_label(context, "todo item title", NK_TEXT_ALIGN_LEFT);
+
+        draw_todo_item(context);
+        draw_todo_item(context);
+        draw_todo_item(context);
+
+        nk_layout_row_static(context, 30, 100, 1);
+        if (nk_button_label(context, "Add new todo")) {
+            printf("add button click");
+        }
+        nk_end(context);
+    }
+}
+
+// a collection of widgets
+// TODO: remove
+int draw_widget_tester(struct nk_context* ctx) {
+    struct nk_rect frame_bounds = { 40,40,600,400 };
+
+    if (nk_begin(ctx, "Misc widgets", frame_bounds, NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_TITLE))
+    {
+        enum { EASY, HARD };
+        static int op = EASY;
+        static int property = 20;
+
+        nk_layout_row_static(ctx, 30, 80, 1);
+        if (nk_button_label(ctx, "button")) {
+            printf("button pressed\n");
+        }
+        nk_layout_row_dynamic(ctx, 40, 2);
+        if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
+        if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
+        nk_layout_row_dynamic(ctx, 45, 1);
+        nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
+
+        // My test wigets
+        nk_layout_row_dynamic(ctx, 20, 2);
+        static char label[] = "Words";
+        nk_text_wrap(ctx, label, strlen(label));
+        nk_text_wrap(ctx, label, strlen(label));
+
+        static char input[20];
+        static int input_len;
+        nk_label(ctx, "Title:", NK_TEXT_RIGHT);
+        nk_edit_string(ctx, NK_EDIT_FIELD, &input, &input_len, 20, NULL);
+    }
+    nk_end(ctx);
+}
+
 
 
 int main(int argc, char** argv)
 {
-    struct nk_color clear = { 0,100,0,255 };
+    struct nk_color clear = { 0,0,0,255 };
     struct nk_vec2 vec;
-    struct nk_rect bounds = { 40,40,0,0 };
+
 
     SDL_Init(SDL_INIT_VIDEO);
     printf("sdl init called...\n");
@@ -223,7 +302,6 @@ int main(int argc, char** argv)
 
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
-
     SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, dm.w - 200, dm.h - 200, 32, SDL_PIXELFORMAT_ARGB8888);
 
 
@@ -236,46 +314,17 @@ int main(int argc, char** argv)
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            nk_sdl_handle_event(&(context->ctx), &event);
+            nk_sdl_handle_event(ctx, &event);
         }
-        nk_input_end(&(context->ctx));
+        nk_input_end(ctx);
 
-        bounds.w = 400;
-        bounds.h = 400;
-        if (nk_begin(&(context->ctx), "Test", bounds, NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_TITLE))
-        {
-            enum { EASY, HARD };
-            static int op = EASY;
-            static int property = 20;
-            nk_layout_row_static(ctx, 30, 80, 1);
-            if (nk_button_label(ctx, "button")) {
-                printf("button pressed\n");
-            }
-            nk_layout_row_dynamic(ctx, 40, 2);
-            if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
-            if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
-            nk_layout_row_dynamic(ctx, 45, 1);
-            nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
+        draw_widget_tester(ctx);
 
-            // My test wigets
-            nk_layout_row_dynamic(&(context->ctx), 20, 2);
-            static char label[] = "Words";
-            nk_text_wrap(ctx, label, strlen(label));
-            nk_text_wrap(ctx, label, strlen(label));
+        grid_demo(ctx);
 
-            static char input[20];
-            static int input_len;
-            nk_label(ctx, "Title:", NK_TEXT_RIGHT);
-            nk_edit_string(ctx, NK_EDIT_FIELD, &input, &input_len, 20, NULL);
-        }
-        nk_end(&(context->ctx));
-
-        grid_demo(&(context->ctx));
+        draw_todo_list(ctx);
 
         nk_sdlsurface_render(context, clear, 1);
-
-
-
 
         SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_RenderCopy(renderer, tex, NULL, NULL);
